@@ -1,103 +1,102 @@
-import Image from "next/image";
+"use client";
+import React, { useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import {
+  OrbitControls,
+  MeshWobbleMaterial,
+} from "@react-three/drei";
 
-export default function Home() {
+const CanvasMain = ({ children }: any) => {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <Canvas>
+      <ambientLight intensity={0.4} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <OrbitControls />
+      <directionalLight color={"red"} position={[0, 0, 5]} />
+      <pointLight position={[10, 10, 10]} />
+      {children}
+    </Canvas>
+  );
+};
+
+const Cube = () => {
+  const ref = useRef<any>(null);
+
+  useFrame((state, delta) => {
+    ref.current.rotation.x += delta;
+    ref.current.rotation.y += delta;
+    ref.current.rotation.z = Math.sin(state.clock.elapsedTime) * 2;
+    console.log("", state.clock.elapsedTime);
+  });
+
+  return (
+    <mesh position={[-4, 1, -2]} ref={ref}>
+      <boxGeometry args={[1, 2, 3]} />
+      <meshStandardMaterial color={"hotpink"} />
+    </mesh>
+  );
+};
+
+const Sphere = () => {
+  return (
+    <mesh position={[1, 0, -2]}>
+      <sphereGeometry args={[2, 100, 100]} />
+      <meshStandardMaterial color={"red"} />
+    </mesh>
+  );
+};
+
+const Torus = () => {
+  const ref = useRef<any>(null);
+
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+
+  useFrame((state, delta) => {
+    const speef = isHovered ? 0.1 : 0.02;
+    ref.current.rotation.x += speef;
+  });
+  return (
+    <mesh
+      position={[-6, 1, -10]}
+      ref={ref}
+      onPointerEnter={(even) => (event?.stopPropagation(), setIsHovered(true))}
+      onPointerLeave={(event) => setIsHovered(false)}
+      onClick={() => setIsClicked(!isClicked)}
+      scale={isClicked ? 1.5 : 2}
+    >
+      <torusGeometry args={[1, 0.2, 200]} />
+      <meshStandardMaterial color={isHovered ? "red" : "lightblue"} />
+    </mesh>
+  );
+};
+
+const Wobble = () => {
+  return (
+    <mesh position={[1, 1, 1]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <MeshWobbleMaterial
+        color="hotpink"
+        factor={0.9} 
+        speed={4} 
+      />
+    </mesh>
+  );
+};
+
+const Home = () => {
+  return (
+    <div className="h-screen w-screen">
+      <h1>I am heading 1</h1>
+
+      <CanvasMain>
+        <Cube />
+        <Sphere />
+        <Torus />
+        <Wobble />
+      </CanvasMain>
     </div>
   );
-}
+};
+
+export default Home;
