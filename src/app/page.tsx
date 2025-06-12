@@ -4,7 +4,9 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import {
   OrbitControls,
   MeshWobbleMaterial,
+  GradientTexture,
 } from "@react-three/drei";
+
 
 const CanvasMain = ({ children }: any) => {
   return (
@@ -18,6 +20,7 @@ const CanvasMain = ({ children }: any) => {
     </Canvas>
   );
 };
+
 
 const Cube = () => {
   const ref = useRef<any>(null);
@@ -53,8 +56,8 @@ const Torus = () => {
   const [isClicked, setIsClicked] = useState<boolean>(false);
 
   useFrame((state, delta) => {
-    const speef = isHovered ? 0.1 : 0.02;
-    ref.current.rotation.x += speef;
+    const speed = isHovered ? 0.1 : 0.02;
+    ref.current.rotation.x += speed;
   });
   return (
     <mesh
@@ -76,10 +79,15 @@ const Wobble = () => {
     <mesh position={[1, 1, 1]}>
       <boxGeometry args={[1, 1, 1]} />
       <MeshWobbleMaterial
-        color="hotpink"
-        factor={0.9} 
-        speed={4} 
-      />
+        factor={0.9}
+        speed={4}
+      >
+        <GradientTexture
+          attach="map"
+          stops={[0, 1]}
+          colors={['red', 'lightgreen']}
+        />
+      </MeshWobbleMaterial>
     </mesh>
   );
 };
